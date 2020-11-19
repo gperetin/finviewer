@@ -1,0 +1,11 @@
+[package]
+name = "finviewer"
+version = "0.1.0"
+authors = ["Goran Peretin <goran.peretin@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+druid = { git = "https://github.com/linebender/druid.git" }
+chrono = "0.4"
