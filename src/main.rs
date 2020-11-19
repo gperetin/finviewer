@@ -1,9 +1,10 @@
 use std::sync::Arc;
 use chrono::naive::NaiveDate;
 
-use druid::{AppLauncher, Data, Lens, Widget, WindowDesc, PlatformError};
+use druid::{AppLauncher, Color, Data, Lens, Rect, Widget, WindowDesc, PlatformError};
 
 use druid::widget::{Flex, Label, Padding};
+use druid::widget::prelude::*;
 
 
 #[derive(Clone, Debug, Lens, Data)]
@@ -31,18 +32,18 @@ impl Widget<AppData> for ChartWidget {
         &mut self,
         _ctx: &mut LifeCycleCtx,
         _event: &LifeCycle,
-        _data: &String,
+        _data: &AppData,
         _env: &Env,
     ) {
     }
 
-    fn update(&mut self, _ctx: &mut UpdateCtx, _old_data: &String, _data: &String, _env: &Env) {}
+    fn update(&mut self, _ctx: &mut UpdateCtx, _old_data: &AppData, _data: &AppData, _env: &Env) {}
 
     fn layout(
         &mut self,
         _layout_ctx: &mut LayoutCtx,
         bc: &BoxConstraints,
-        _data: &String,
+        _data: &AppData,
         _env: &Env,
     ) -> Size {
         // BoxConstraints are passed by the parent widget.
@@ -64,7 +65,7 @@ impl Widget<AppData> for ChartWidget {
         }
     }
 
-    fn paint(&mut self, ctx: &mut PaintCtx, data: &String, env: &Env) {
+    fn paint(&mut self, ctx: &mut PaintCtx, data: &AppData, env: &Env) {
         // here we iterate over all the bars in AppData and draw a rectangle for each
         // we should also have some spacing between bars
         // Challenge:
@@ -72,7 +73,7 @@ impl Widget<AppData> for ChartWidget {
         // How to figure out Y axis?
         // - while drawing, remember min and max value drawn, then add some padding on each
         //
-        // ctx.size() returns the size of the rectangle we're panting into
+        // ctx.size() returns the size of the rectangle we're painting into
         // somehow we have to map bars onto that.
         // - one solution is to do 2 passes, compute difference between min and max price
         //   and divide that by the vertical height of the size - some_padding, so we have mapping
