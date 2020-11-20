@@ -1,5 +1,5 @@
 use std::sync::Arc;
-// use chrono::naive::NaiveDate;
+use chrono::{Datelike, NaiveDate};
 
 use druid::{AppLauncher, Color, Data, Lens, Rect, Widget, WindowDesc, PlatformError};
 use druid::kurbo::Line;
@@ -11,6 +11,7 @@ use druid::widget::prelude::*;
 
 const BAR_WIDTH: i32 = 10;
 const BAR_SPACING: i32 = 5;
+const X_AXIS_LABELS_PADDING: f64 = 20.0;
 const Y_TICK_SPACING: f64 = 50.0; // Ticks on y axis every 50 pixels
 const Y_AXIS_LABELS_PADDING: f64 = 40.0;
 static Y_AXIS_TICK_INCREMENTS: &'static [f64] = &[0.1, 0.5, 1.0, 10.0, 100.0];
@@ -18,7 +19,7 @@ static Y_AXIS_TICK_INCREMENTS: &'static [f64] = &[0.1, 0.5, 1.0, 10.0, 100.0];
 
 #[derive(Clone, Debug, Lens, Data)]
 struct Bar {
-    // date: Arc<NaiveDate>, // wrap this is Arc because Data trait is implemented for that.
+    date: Arc<NaiveDate>, // wrap this is Arc because Data trait is implemented for that.
     open: f64,
     high: f64,
     low: f64,
@@ -95,7 +96,7 @@ impl Widget<AppData> for ChartWidget {
         let scaling: f64 = size.height / (max_price - min_price);
 
         // Plot axis
-        let x_axis = Line::new((BAR_SPACING as f64, size.height - BAR_SPACING as f64), (size.width - Y_AXIS_LABELS_PADDING, size.height - BAR_SPACING as f64));
+        let x_axis = Line::new((BAR_SPACING as f64, size.height - X_AXIS_LABELS_PADDING), (size.width - Y_AXIS_LABELS_PADDING, size.height - X_AXIS_LABELS_PADDING));
         let y_axis = Line::new((size.width - Y_AXIS_LABELS_PADDING, BAR_SPACING as f64), (size.width - Y_AXIS_LABELS_PADDING, size.height - BAR_SPACING as f64));
         ctx.stroke(x_axis, &Color::WHITE, 1.0);
         ctx.stroke(y_axis, &Color::WHITE, 1.0);
@@ -174,6 +175,16 @@ impl Widget<AppData> for ChartWidget {
 
             ctx.fill(bar_rect, &fill_color);
 
+            // Put X-axis label
+            let layout = ctx
+                .text()
+                .new_text_layout(bar.date.day().to_string())
+                .font(FontFamily::SERIF, 12.0)
+                .text_color(Color::WHITE)
+                .build()
+                .unwrap();
+            ctx.draw_text(&layout, (x_position as f64, size.height - X_AXIS_LABELS_PADDING + 5.0));
+
             x_position += BAR_WIDTH + BAR_SPACING;
         }
     }
@@ -198,11 +209,11 @@ fn main() -> Result<(), PlatformError> {
     let window = WindowDesc::new(build_ui);
     let launcher = AppLauncher::with_window(window).use_simple_logger();
     let bars = Arc::new(vec![
-        Bar { open: 100.1, high: 100.3, low: 99.0, close: 100.5 },
-        Bar { open: 100.6, high: 101.5, low: 100.6, close: 101.1 },
-        Bar { open: 102.6, high: 102.7, low: 100.6, close: 101.1 },
-        Bar { open: 101.6, high: 101.9, low: 100.6, close: 101.3 },
-        Bar { open: 104.1, high: 104.1, low: 100.1, close: 102.8 },
+        Bar { date: Arc::new(NaiveDate::from_ymd(2020,12,1)), open: 100.1, high: 100.3, low: 99.0, close: 100.5 },
+        Bar { date: Arc::new(NaiveDate::from_ymd(2020,12,2)), open: 100.6, high: 101.5, low: 100.6, close: 101.1 },
+        Bar { date: Arc::new(NaiveDate::from_ymd(2020,12,3)), open: 102.6, high: 102.7, low: 100.6, close: 101.1 },
+        Bar { date: Arc::new(NaiveDate::from_ymd(2020,12,4)), open: 101.6, high: 101.9, low: 100.6, close: 101.3 },
+        Bar { date: Arc::new(NaiveDate::from_ymd(2020,12,5)), open: 104.1, high: 104.1, low: 100.1, close: 102.8 },
     ]);
 
     launcher.launch(AppData { chart: bars })?;
