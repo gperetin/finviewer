@@ -3,6 +3,7 @@ use std::sync::Arc;
 
 use druid::{AppLauncher, Color, Data, Lens, Rect, Widget, WindowDesc, PlatformError};
 use druid::kurbo::Line;
+use druid::piet::{FontFamily, RenderContext, Text, TextLayout, TextLayoutBuilder};
 
 use druid::widget::{Flex, Label, Padding, SizedBox};
 use druid::widget::prelude::*;
@@ -10,6 +11,10 @@ use druid::widget::prelude::*;
 
 const BAR_WIDTH: i32 = 10;
 const BAR_SPACING: i32 = 5;
+const Y_TICK_SPACING: f64 = 50.0; // Ticks on y axis every 50 pixels
+const Y_AXIS_LABELS_PADDING: f64 = 40.0;
+static Y_AXIS_TICK_INCREMENTS: &'static [f64] = &[0.1, 0.5, 1.0, 10.0, 100.0];
+
 
 #[derive(Clone, Debug, Lens, Data)]
 struct Bar {
@@ -87,9 +92,52 @@ impl Widget<AppData> for ChartWidget {
         let size = ctx.size();
         // size is 100x100 because that's what we defined in the layout method()
 
-        println!("{:?}", size);
         let scaling: f64 = size.height / (max_price - min_price);
 
+        // Plot axis
+        let x_axis = Line::new((BAR_SPACING as f64, size.height - BAR_SPACING as f64), (size.width - Y_AXIS_LABELS_PADDING, size.height - BAR_SPACING as f64));
+        let y_axis = Line::new((size.width - Y_AXIS_LABELS_PADDING, BAR_SPACING as f64), (size.width - Y_AXIS_LABELS_PADDING, size.height - BAR_SPACING as f64));
+        ctx.stroke(x_axis, &Color::WHITE, 1.0);
+        ctx.stroke(y_axis, &Color::WHITE, 1.0);
+
+        // Plot ticks on Y axis
+        let price_range = max_price - min_price;
+        let approx_num_of_ticks = size.height / Y_TICK_SPACING;
+        let mut closest_tick_size = Y_AXIS_TICK_INCREMENTS[0];
+        let mut closest_num_ticks = price_range / closest_tick_size;
+
+        for tick_size in Y_AXIS_TICK_INCREMENTS {
+            if ((price_range / tick_size) - approx_num_of_ticks).abs() < (closest_num_ticks - approx_num_of_ticks).abs() {
+                closest_tick_size = *tick_size;
+                closest_num_ticks = price_range / *tick_size;
+            }
+        }
+
+        let y_tick_start = max_price % closest_tick_size;
+        let mut current_y_tick = y_tick_start;
+        while (max_price - current_y_tick) > min_price {
+            let tick_line = Line::new(
+                (size.width - Y_AXIS_LABELS_PADDING, current_y_tick * scaling),
+                (size.width - Y_AXIS_LABELS_PADDING + 5.0, current_y_tick * scaling)
+            );
+
+            ctx.stroke(tick_line, &Color::WHITE, 1.0);
+
+            // Put the tick label
+            let price_label = max_price - current_y_tick;
+            let layout = ctx
+                .text()
+                .new_text_layout(price_label.to_string())
+                .font(FontFamily::SERIF, 12.0)
+                .text_color(Color::WHITE)
+                .build()
+                .unwrap();
+            ctx.draw_text(&layout, (size.width - Y_AXIS_LABELS_PADDING + 10.0, current_y_tick * scaling - layout.size().height / 2.0));
+
+            current_y_tick += closest_tick_size;
+        }
+
+        // Plot candlesticks
         let mut x_position: i32 = BAR_SPACING * 2; // Let's leave some padding to the left
 
         for bar in data.chart.iter() {
