@@ -12,3 +12,17 @@ pub struct Bar {
     pub low: f64,
     pub close: f64
 }
+
+
+#[derive(Debug, Clone, Data, Lens)]
+pub struct Chart {
+    pub bars: Arc<Vec<Bar>>
+}
+
+impl Chart {
+    pub fn new() -> Self {
+        Self {
+            bars: Arc::new(vec![])
+        }
+    }
+}
