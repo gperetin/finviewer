@@ -9,3 +9,14 @@ edition = "2018"
 [dependencies]
 druid = { git = "https://github.com/linebender/druid.git" }
 chrono = "0.4"
+config = "0.10.1"
+# postgres = "0.18.1"
+
+[dependencies.rust_decimal]
+version = "1.8.1"
+features = ["db-postgres"]
+
+[dependencies.postgres]
+version = "0.18.1"
+# with-chrono allows us to parse from Postgres timestamp into Rust NaiveDatetime
+features = ["with-chrono-0_4"]

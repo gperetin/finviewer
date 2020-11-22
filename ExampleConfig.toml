@@ -1,0 +1,7 @@
+# Rename this to Config.toml and fill in the values
+
+[database]
+host = "localhost"
+user = "postgres"
+password = "somepassword"
+dbname = "somedbname"
