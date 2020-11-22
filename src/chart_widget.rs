@@ -15,6 +15,7 @@ const X_AXIS_LABELS_PADDING: f64 = 20.0;
 const Y_TICK_SPACING: f64 = 50.0; // Ticks on y axis every 50 pixels
 const Y_AXIS_LABELS_PADDING: f64 = 40.0;
 static Y_AXIS_TICK_INCREMENTS: &'static [f64] = &[0.1, 0.5, 1.0, 10.0, 100.0];
+const TEXT_COLOR: Color = Color::rgb8(0xef, 0xf8, 0xff);
 
 pub struct ChartWidget;
 
@@ -97,8 +98,8 @@ impl Widget<Chart> for ChartWidget {
             (size.width - Y_AXIS_LABELS_PADDING, BAR_SPACING as f64),
             (size.width - Y_AXIS_LABELS_PADDING, size.height - BAR_SPACING as f64)
         );
-        ctx.stroke(x_axis, &Color::WHITE, 1.0);
-        ctx.stroke(y_axis, &Color::WHITE, 1.0);
+        ctx.stroke(x_axis, &TEXT_COLOR, 1.0);
+        ctx.stroke(y_axis, &TEXT_COLOR, 1.0);
 
         // Plot ticks on Y axis
         let price_range = max_price - min_price;
@@ -121,15 +122,15 @@ impl Widget<Chart> for ChartWidget {
                 (size.width - Y_AXIS_LABELS_PADDING + 5.0, current_y_tick * scaling)
             );
 
-            ctx.stroke(tick_line, &Color::WHITE, 1.0);
+            ctx.stroke(tick_line, &TEXT_COLOR, 1.0);
 
             // Put the tick label
             let price_label = max_price - current_y_tick;
             let layout = ctx
                 .text()
                 .new_text_layout(price_label.to_string())
-                .font(FontFamily::SERIF, 12.0)
-                .text_color(Color::WHITE)
+                .font(FontFamily::SANS_SERIF, 14.0)
+                .text_color(TEXT_COLOR)
                 .build()
                 .unwrap();
             ctx.draw_text(
@@ -150,7 +151,7 @@ impl Widget<Chart> for ChartWidget {
             let bar_low = (max_price - bar.low) * scaling;
 
             let wick = Line::new((x_position as f64, bar_high as f64), (x_position as f64, bar_low as f64));
-            ctx.stroke(wick, &Color::rgb8(105, 105, 105), 1.0);
+            ctx.stroke(wick, &TEXT_COLOR, 1.0);
 
             // Now let's plot the candle body
             let higher_value = if bar.close > bar.open { bar.close } else { bar.open };
@@ -165,10 +166,10 @@ impl Widget<Chart> for ChartWidget {
             let bar_rect = Rect::from_origin_size(bar_start, (BAR_WIDTH as f64, bar_height as f64));
 
             let fill_color = if higher_value == bar.close {
-                Color::rgb(0x00, 0xFF, 0x00)
+                Color::rgb8(0x38, 0xc1, 0x72)
                 // let fill_color = Color::rgba8(0x00, 0x00, 0x00, 0x7F);
             } else {
-                Color::rgb(0xFF, 0x00, 0x00)
+                Color::rgb8(0xdc, 0x30, 0x30)
             };
 
             ctx.fill(bar_rect, &fill_color);
@@ -177,8 +178,8 @@ impl Widget<Chart> for ChartWidget {
             let layout = ctx
                 .text()
                 .new_text_layout(bar.date.day().to_string())
-                .font(FontFamily::SERIF, 12.0)
-                .text_color(Color::WHITE)
+                .font(FontFamily::SANS_SERIF, 14.0)
+                .text_color(TEXT_COLOR)
                 .build()
                 .unwrap();
             ctx.draw_text(&layout, (x_position as f64, size.height - X_AXIS_LABELS_PADDING + 5.0));

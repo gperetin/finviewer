@@ -9,10 +9,12 @@ use types::{Bar, Chart};
 mod chart_widget;
 use chart_widget::ChartWidget;
 
-use druid::{AppLauncher, Data, Lens, Widget, WindowDesc, PlatformError};
+use druid::{AppLauncher, Color, Data, Lens, Widget, WindowDesc, PlatformError};
 use druid::widget::{Flex, Label, WidgetExt, Padding, SizedBox};
 use postgres::{Client, NoTls};
 use rust_decimal::prelude::*;
+
+const DARK_GRAY: Color = Color::rgb8(0x21, 0x29, 0x34);
 
 
 fn get_daily_price(mut client: Client, symbol: &str) -> Vec<Bar> {
@@ -59,7 +61,7 @@ fn build_ui() -> impl Widget<AppData> {
                             Padding::new(10.0, (ChartWidget {}).lens(AppData::chart))
                         ).expand_height().expand_width(), 5.0),
                 1.0)
-    )
+    ).background(DARK_GRAY)
 }
 
 fn main() -> Result<(), PlatformError> {
