@@ -254,10 +254,11 @@ fn build_ui() -> impl Widget<AppData> {
 
 fn main() -> Result<(), PlatformError> {
     let window = WindowDesc::new(build_ui);
-    let launcher = AppLauncher::with_window(window).use_simple_logger();
+    let launcher = AppLauncher::with_window(window);
 
     let mut cfg = config::Config::default();
     cfg.merge(config::File::with_name("Config")).unwrap();
+
 
     // Instantiate the client and get the data
     let pg_client = Client::connect(

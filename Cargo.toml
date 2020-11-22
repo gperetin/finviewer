@@ -10,7 +10,6 @@ edition = "2018"
 druid = { git = "https://github.com/linebender/druid.git" }
 chrono = "0.4"
 config = "0.10.1"
-# postgres = "0.18.1"
 
 [dependencies.rust_decimal]
 version = "1.8.1"
