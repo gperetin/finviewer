@@ -2,7 +2,10 @@ extern crate config;
 
 use std::sync::Arc;
 use std::time::Instant;
-use chrono::{Datelike, NaiveDate, NaiveDateTime};
+use chrono::{Datelike, NaiveDateTime};
+
+mod lib;
+use lib::Bar;
 
 use druid::{AppLauncher, Color, Data, Lens, Rect, Widget, WindowDesc, PlatformError};
 use druid::kurbo::Line;
@@ -47,17 +50,6 @@ fn get_daily_price(mut client: Client, symbol: &str) -> Vec<Bar> {
     }
     bars
 }
-
-
-#[derive(Clone, Debug, Lens, Data)]
-struct Bar {
-    date: Arc<NaiveDate>, // wrap this is Arc because Data trait is implemented for that.
-    open: f64,
-    high: f64,
-    low: f64,
-    close: f64
-}
-
 
 #[derive(Clone, Lens, Data)]
 struct AppData {
@@ -107,7 +99,7 @@ impl Widget<AppData> for ChartWidget {
         }
     }
 
-    fn paint(&mut self, ctx: &mut PaintCtx, data: &AppData, env: &Env) {
+    fn paint(&mut self, ctx: &mut PaintCtx, data: &AppData, _env: &Env) {
         let start_time = Instant::now();
 
         let size = ctx.size();
