@@ -58,7 +58,7 @@ fn build_ui() -> impl Widget<AppData> {
                     .with_spacer(8.0)
                     .with_flex_child(
                         SizedBox::new(
-                            Padding::new(10.0, (ChartWidget {}).lens(AppData::chart))
+                            Padding::new(10.0, (ChartWidget::empty()).lens(AppData::chart))
                         ).expand_height().expand_width(), 5.0),
                 1.0)
     ).background(DARK_GRAY)
